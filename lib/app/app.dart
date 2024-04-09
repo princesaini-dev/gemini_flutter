@@ -4,9 +4,9 @@ import 'package:google_gemini_sample/data/block/chat_list_block.dart';
 import 'package:google_gemini_sample/presentation/resources/routes_manager.dart';
 
 class MyApp extends StatefulWidget {
-  MyApp._internal(); // private named constructor
-  int appState = 0;
-  static final MyApp instance =
+  const MyApp._internal(); // private named constructor
+  final int appState = 0;
+  static const MyApp instance =
       MyApp._internal(); // single instance -- singleton
 
   factory MyApp() => instance; // factory for the class instance

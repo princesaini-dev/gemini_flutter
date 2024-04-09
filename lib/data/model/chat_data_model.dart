@@ -13,4 +13,4 @@ class ChatDataModel {
 
 enum SenderType { user, remote, error }
 
-enum MessageType { text, image }
+enum MessageType { text, image, loading }

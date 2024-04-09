@@ -1,3 +1,7 @@
+import 'dart:io';
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 extension PaddingExtension on Widget {
@@ -49,4 +53,14 @@ extension PaddingExtension on Widget {
       child: this,
     );
   }
+}
+
+extension PrintMessages on String {
+  
+  void printMessage() {
+    if (kDebugMode) {
+      print(this);
+    }
+  }
+
 }
