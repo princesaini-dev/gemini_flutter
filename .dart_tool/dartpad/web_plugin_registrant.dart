@@ -7,12 +7,14 @@
 // ignore_for_file: type=lint
 
 import 'package:flutter_dropzone_web/flutter_dropzone_plugin.dart';
+import 'package:fluttertoast/fluttertoast_web.dart';
 import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 void registerPlugins([final Registrar? pluginRegistrar]) {
   final Registrar registrar = pluginRegistrar ?? webPluginRegistrar;
   FlutterDropzonePlugin.registerWith(registrar);
+  FluttertoastWebPlugin.registerWith(registrar);
   ImagePickerPlugin.registerWith(registrar);
   registrar.registerMessageHandler();
 }

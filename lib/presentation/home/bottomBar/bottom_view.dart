@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_gemini_sample/presentation/utills/extentions.dart';
 
-Widget bottomWidgetContainer(double screenWidth,
-    Function(String) onSendClick, Function(String) onUploadFileClick) {
+Widget bottomWidgetContainer(double screenWidth, Function(String) onSendClick,
+    Function(String) onUploadFileClick) {
   final TextEditingController messageEditController = TextEditingController();
   final myFocusNode = FocusNode();
   return Row(
@@ -10,34 +10,37 @@ Widget bottomWidgetContainer(double screenWidth,
     crossAxisAlignment: CrossAxisAlignment.center,
     children: [
       Expanded(
-        child: Stack(
-          children: [
-            TextField(
-              focusNode: myFocusNode,
-              onSubmitted: (value) {
-                onSendClick(messageEditController.text);
-                messageEditController.clear();
-                myFocusNode.requestFocus();
-              },
-              controller: messageEditController,
-              decoration: InputDecoration(
-                  hintText: 'Enter message',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12))),
-            ),
-            Positioned(
-              right: 12,
-              top: 0,
-              bottom: 0,
-              child: IconButton(
+        child: TextField(
+          style: const TextStyle(color: Colors.black),
+          focusNode: myFocusNode,
+          onSubmitted: (value) {
+            onSendClick(messageEditController.text);
+            messageEditController.clear();
+            myFocusNode.requestFocus();
+          },
+          cursorColor: Colors.black,
+          controller: messageEditController,
+          decoration: InputDecoration(
+              enabledBorder: OutlineInputBorder(
+                  borderSide:
+                      BorderSide(color: Colors.grey.shade200, width: 0.0),
+                  borderRadius: BorderRadius.circular(25.0)),
+              focusedBorder: OutlineInputBorder(
+                  borderSide:
+                      BorderSide(color: Colors.grey.shade200, width: 0.0),
+                  borderRadius: BorderRadius.circular(25.0)),
+              hintText: 'Enter message',
+              filled: true,
+              fillColor: Colors.grey.shade200,
+              suffixIcon: IconButton(
                   onPressed: () {
                     onSendClick(messageEditController.text);
                     messageEditController.clear();
                     myFocusNode.requestFocus();
                   },
                   icon: const Icon(Icons.send_rounded)),
-            )
-          ],
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0))),
         ).paddingAll(18),
       ),
       // SizedBox(

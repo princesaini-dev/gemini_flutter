@@ -15,6 +15,7 @@ import 'package:google_gemini_sample/presentation/home/slider/slider_view.dart';
 import 'package:google_gemini_sample/presentation/messageView/chat_message_item_view.dart';
 import 'package:google_gemini_sample/presentation/utills/app_conponents.dart';
 import 'package:google_gemini_sample/presentation/utills/extentions.dart';
+import 'package:google_gemini_sample/presentation/utills/style/gradient_text.dart';
 import 'package:image_picker/image_picker.dart';
 
 class HomeScreen extends BaseStatefulWidget {
@@ -38,10 +39,21 @@ class _HomeScreenState extends BaseStatefulWidgetState<HomeScreen> {
       backgroundColor: Colors.white,
       body: SliderDrawer(
         key: _sliderDrawerKey,
-        appBar: const SliderAppBar(
+        appBar: SliderAppBar(
             appBarColor: Colors.white,
-            title: Text('Chat with AI',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700))),
+            title: GradientText(
+            'Chat with AI',
+            gradient: LinearGradient(colors: [
+              Colors.pink.shade400,
+              Colors.blue.shade400,
+              Colors.yellow.shade400,
+              Colors.red.shade400,
+              Colors.green.shade400,
+              Colors.orange.shade400,
+            ]),
+            style: const TextStyle(
+                color: Colors.blue, fontWeight: FontWeight.w800, fontSize: 22),
+          )),
         slider: SliderView(
           onItemClick: (title) {
             _sliderDrawerKey.currentState!.closeSlider();
