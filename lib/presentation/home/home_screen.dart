@@ -2,28 +2,89 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:google_gemini_sample/data/block/chat_list_block.dart';
 import 'package:google_gemini_sample/data/block/chat_list_event.dart';
 import 'package:google_gemini_sample/data/block/chat_list_state.dart';
 import 'package:google_gemini_sample/data/model/chat_data_model.dart';
-import 'package:google_gemini_sample/presentation/home/components/bottom_view.dart';
-import 'package:google_gemini_sample/presentation/home/components/chat_message_item_view.dart';
+import 'package:google_gemini_sample/presentation/base/base_stateful_widget.dart';
+import 'package:google_gemini_sample/presentation/home/bottomBar/bottom_view.dart';
+import 'package:google_gemini_sample/presentation/home/emptyView/enpty_Data_view.dart';
+import 'package:google_gemini_sample/presentation/home/slider/slider_view.dart';
+import 'package:google_gemini_sample/presentation/messageView/chat_message_item_view.dart';
+import 'package:google_gemini_sample/presentation/utills/app_conponents.dart';
 import 'package:google_gemini_sample/presentation/utills/extentions.dart';
 import 'package:image_picker/image_picker.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends BaseStatefulWidget {
   HomeScreen({super.key});
   final ImagePicker imagePicker = ImagePicker();
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  BaseStatefulWidgetState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends BaseStatefulWidgetState<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey<SliderDrawerState> _sliderDrawerKey =
+      GlobalKey<SliderDrawerState>();
   final _gemini = Gemini.instance;
-  DropzoneViewController? _dropzoneViewController;
+  String _conversationString = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+        child: Scaffold(
+      backgroundColor: Colors.white,
+      body: SliderDrawer(
+        key: _sliderDrawerKey,
+        appBar: const SliderAppBar(
+            appBarColor: Colors.white,
+            title: Text('Chat with AI',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700))),
+        slider: SliderView(
+          onItemClick: (title) {
+            _sliderDrawerKey.currentState!.closeSlider();
+            switch (title) {
+              case 'New Chat':
+                _startNewChat();
+                break;
+              default:
+            }
+          },
+        ),
+        child: BlocBuilder<ChatListBlock, ChatListState>(
+          builder: (context, state) {
+            if (state is ChatListUpdated && state.chatDataList.isNotEmpty) {
+              final chatList = state.chatDataList;
+              return ListView.builder(
+                controller: _scrollController,
+                itemBuilder: (context, index) {
+                  return chatMessageItemView(chatList[index]);
+                },
+                itemCount: chatList.length,
+                shrinkWrap: true,
+              ).paddingHorizontal(getScreenWidth(context) * 0.2);
+            } else {
+              return const EmptyDataView();
+            }
+          },
+        ),
+      ).paddingHorizontal(10),
+      bottomNavigationBar: bottomWidgetContainer(getScreenWidth(context),(message) {
+        _addNewMessage(message, null, SenderType.user, MessageType.text);
+        _getGeminiResult(message);
+      }, (message) {
+        _picImageFromGallery(message);
+      }),
+    ));
+  }
+
+  _startNewChat() {
+    _conversationString = '';
+    final chatListBlock = BlocProvider.of<ChatListBlock>(context);
+    chatListBlock.add(ClearAllConversations());
+  }
 
   _picImageFromGallery(String message) async {
     final XFile? pickedFile = await widget.imagePicker.pickImage(
@@ -47,8 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
             });
   }
 
-  String _conversationString = '';
-
   _getGeminiResult(String question) async {
     'QUESTION ::: $question'.printMessage();
     _conversationString += 'User: $question\n';
@@ -57,6 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Content(
           parts: [Parts(text: _conversationString + question)], role: 'user')
     ]).then((value) {
+      'ANSWER ::: ${value?.output}'.printMessage();
       _hideTyping();
       _conversationString += 'Gemini: ${value?.output}\n';
       _addNewMessage(
@@ -97,59 +157,5 @@ class _HomeScreenState extends State<HomeScreen> {
         curve: Curves.easeOut,
       );
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          DropzoneView(
-            operation: DragOperation.copy,
-            cursor: CursorType.grab,
-            onCreated: (DropzoneViewController ctrl) =>
-                _dropzoneViewController = ctrl,
-            onLoaded: () => 'Zone loaded'.printMessage(),
-            onError: (String? ev) => 'Error: $ev'.printMessage(),
-            onHover: () => 'Zone hovered'.printMessage(),
-            onDrop: (dynamic ev) => 'Drop: $ev'.printMessage(),
-            onLeave: () => 'Zone left'.printMessage(),
-            onDropInvalid: (value) {
-              'Drop invalid: $value'.printMessage();
-            },
-            onDropMultiple: (value) {
-              'Drop multiple: $value'.printMessage();
-            },
-          ),
-          BlocBuilder<ChatListBlock, ChatListState>(
-            builder: (context, state) {
-              if (state is ChatListUpdated && state.chatDataList.isNotEmpty) {
-                final chatList = state.chatDataList;
-                return ListView.builder(
-                  controller: _scrollController,
-                  itemBuilder: (context, index) {
-                    return chatMessageItemView(chatList[index]);
-                  },
-                  itemCount: chatList.length,
-                  shrinkWrap: true,
-                );
-              } else {
-                return const Center(
-                  child: Text('No Data Found'),
-                );
-              }
-            },
-          )
-        ],
-      ),
-      bottomNavigationBar: bottomWidgetContainer((message) {
-        _addNewMessage(message, null, SenderType.user, MessageType.text);
-        _getGeminiResult(message);
-      }, (message) {
-        _picImageFromGallery(message);
-      }),
-    ));
   }
 }

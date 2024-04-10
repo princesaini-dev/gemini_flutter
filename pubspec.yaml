@@ -41,6 +41,8 @@ dependencies:
   flutter_bloc: ^8.1.3
   bloc: ^8.1.2
   flutter_dropzone: ^4.0.0
+  loading_indicator: ^3.1.1
+  flutter_slider_drawer: ^2.1.3
 
 dev_dependencies:
   flutter_test:

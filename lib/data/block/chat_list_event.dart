@@ -16,3 +16,5 @@ class DeleteChatData extends ChatListEvent {
     required this.chat,
   });
 }
+
+class ClearAllConversations extends ChatListEvent {}
